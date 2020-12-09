@@ -33,3 +33,38 @@ const render = require("./lib/htmlRenderer");
 // for further information. Be sure to test out each class and verify it generates an
 // object with the correct structure and methods. This structure will be crucial in order
 // for the provided `render` function to work! ```
+
+var questionsCommon = [
+    {
+        type: 'input',
+        message: 'ID:',
+        name: 'id',
+    },
+    {
+        type: 'input',
+        message: 'Name:',
+        name: 'name',
+    },
+    {
+        type: 'input',
+        message: 'Email:',
+        name: 'email',
+    },
+]
+
+var questionsManager = [
+    {
+        type: 'input',
+        message: 'Office Number:',
+        name: 'officeNumber',
+    }
+]
+
+var teamMembers = [];
+
+console.log("Manager information");
+inquirer.prompt(questionsCommon.concat(questionsManager)).then(
+    (response) => {
+        var manager = new Manager(response.name, response.id, response.email, response.officeNumber);
+    }
+)
