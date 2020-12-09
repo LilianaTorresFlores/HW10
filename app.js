@@ -60,11 +60,80 @@ var questionsManager = [
     }
 ]
 
+var questionsIntern = [
+    {
+        type: 'input',
+        message: 'School:',
+        name: 'school',
+    }
+]
+
+var questionsEngineer = [
+    {
+        type: 'input',
+        message: 'Github username:',
+        name: 'github',
+    }
+]
+
 var teamMembers = [];
+
+function askForInformation() {
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: "Role of employee",
+            name: 'role',
+            choices: ["Intern", "Engineer"]
+        }
+    ]).then(
+        function(response) {
+            var role = response.role;
+            var questions;
+            if(role == "Intern") {
+                questions = questionsCommon.concat(questionsIntern);
+            }else{
+                questions = questionsCommon.concat(questionsEngineer);
+            }
+            inquirer.prompt(questions).then(
+                function(response) {
+                    var employee;
+                    if(role == "Intern"){
+                        employee = new Intern(response.name, response.id, response.email, response.school);
+                    }else{
+                        employee = new Intern(response.name, response.id, response.email, response.github);
+                    }
+                    teamMembers.push(employee);
+                    inquirer.prompt({
+                        type: 'confirm',
+                        message: 'Do you wish to add another employee?',
+                        name: 'another'
+                    }).then(function(response){
+                        if(response.another){
+                            askForInformation();
+                        }else{
+                            saveHtml();
+                        }
+                    })
+                }
+            )
+        }
+    )
+}
 
 console.log("Manager information");
 inquirer.prompt(questionsCommon.concat(questionsManager)).then(
     (response) => {
         var manager = new Manager(response.name, response.id, response.email, response.officeNumber);
+        teamMembers.push(manager);
+        console.log("Team information");
+        askForInformation();
     }
 )
+
+function saveHtml() {
+    var html = render(teamMembers);
+    fs.writeFile(outputPath, html, (err) =>
+        err ? console.error(err) : console.log('HTML written. Success!')
+    );
+}
